@@ -163,7 +163,7 @@ async function updateStatus(trackingId, status){
     const numbers = await db.get("numbers").value();
     let newNumbers = [];
     newNumbers = numbers.filter( obj => obj.id !== trackingId);
-    newNumbers.push({"id": trackingId, "status": status})
+    newNumbers.push({"id": trackingId, "status": status || "Parcel not handed over"});
     db.get("numbers").remove().write();
     //console.log(newNumbers);
     newNumbers.forEach(element => {
