@@ -124,7 +124,7 @@ async function track(num) {
             return res;
         }).then(async function (res) {
             if(res.data.shipments[0].status){
-                status = res.data.shipments[0].status.status;
+                status = res.data.shipments[0].status.statusCode;
                 
                 if(status === 'The shipment has been successfully delivered'){
                     // Delete from db
@@ -139,7 +139,7 @@ async function track(num) {
             }
             if(status != oldStatus){
                 console.log("old: " + oldStatus + " new: " + status);
-                sendTelegramMessage(trackingId, status);
+                sendTelegramMessage(trackingId, status, oldStatus);
             }
         })
     } catch (error) {
@@ -171,11 +171,20 @@ async function updateStatus(trackingId, status){
     });
 }
 
-function sendTelegramMessage(id, message) {
+function sendTelegramMessage(id, message, old = null) {
+    let text = "";
+    if(old){
+    text = `📯 The status of your parcel (${id}) has changed from: ${old} -> ${message} 📯`;
+    }
+    else{
+    text = `The status of your parcel (${id}) is: ${message} 👋`;
+
+    }
+
     axios.post(`${url}${apiToken}/sendMessage`,
         {
             chat_id: process.env.CHAT_ID,
-            text: `Your TrackingNumber: ${id} is ${message} 👋`
+            text: text
         })
         .then((response) => { 
             //console.log(response);
