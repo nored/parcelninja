@@ -125,7 +125,14 @@ async function track(num) {
         }).then(async function (res) {
             if(res.data.shipments[0].status){
                 status = res.data.shipments[0].status.statusCode;
-                
+                let description = res.data.shipments[0].status.description
+                let nextSteps = res.data.shipments[0].status.nextSteps
+                if(description){
+                    status +="\nDescription:" + description;
+                }
+                if(nextSteps){
+                    status +="\nNext Steps:" + nextSteps;
+                }
                 if(status === 'The shipment has been successfully delivered'){
                     // Delete from db
                     await deleteOne(trackingId);
