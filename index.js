@@ -128,10 +128,10 @@ async function track(num) {
                 let description = res.data.shipments[0].status.description
                 let nextSteps = res.data.shipments[0].status.nextSteps
                 if(description){
-                    status +="\nDescription:" + description;
+                    status +="\nDescription: " + description;
                 }
                 if(nextSteps){
-                    status +="\nNext Steps:" + nextSteps;
+                    status +="\nNext Steps: " + nextSteps;
                 }
                 if(status === 'The shipment has been successfully delivered'){
                     // Delete from db
