@@ -107,7 +107,10 @@ async function track(num) {
         }).then(function (response) {
             const service = response.data.shipments[0].service;
             const originCountryCode = response.data.shipments[0].origin.address.countryCode;
-            const destinationCountryCode = response.data.shipments[0].destination.address.countryCode;
+            let destinationCountryCode = process.env.DESTINATION_COUNTRY_CODE;
+            if(response.data.shipments[0].destination){
+                destinationCountryCode = response.data.shipments[0].destination.address.countryCode || "DE";
+            }
             return {service, originCountryCode, destinationCountryCode};
         }).then(async function (response) {
             const res = await http.get(dhlUrl, {
