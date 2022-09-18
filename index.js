@@ -52,10 +52,7 @@ app.post('/', (req, res) => {
             const number = numbers.find(({ id }) => id === trackingNumber);
             if (number) {
                 trackingNumber = ("Already tracked");
-            } else {
-                db.get("numbers").push({"id": trackingNumber, "status": ""}).write();
-            }
-            axios.post(`${url}${apiToken}/sendMessage`,
+                axios.post(`${url}${apiToken}/sendMessage`,
                 {
                     chat_id: chatId,
                     text: `Your TrackingNumber is: ${trackingNumber} 👋`
@@ -65,6 +62,10 @@ app.post('/', (req, res) => {
                 }).catch((error) => {
                     res.send(error);
                 });
+            } else {
+                db.get("numbers").push({"id": trackingNumber, "status": ""}).write();
+                track(trackingNumber);
+            }
         } else if (sentMessage.match(/\/status/gi)){
             getAll();
             res.status(200).send("Status sent");
