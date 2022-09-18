@@ -64,7 +64,7 @@ app.post('/', (req, res) => {
                 });
             } else {
                 db.get("numbers").push({"id": trackingNumber, "status": ""}).write();
-                track(trackingNumber);
+                track({"id": trackingNumber, "status": ""});
             }
         } else if (sentMessage.match(/\/status/gi)){
             getAll();
