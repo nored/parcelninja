@@ -110,23 +110,32 @@ async function track(num) {
             const service = response.data.shipments[0].service;
             const originCountryCode = response.data.shipments[0].origin.address.countryCode;
             let destinationCountryCode = process.env.DESTINATION_COUNTRY_CODE;
+
             if(response.data.shipments[0].destination){
-                destinationCountryCode = response.data.shipments[0].destination.address.countryCode || "DE";
+                destinationCountryCode = response.data.shipments[0].destination.address.countryCode || process.env.DESTINATION_COUNTRY_CODE;
             }
+            if(!response.data.shipments[0].service){
+                service = false;
+            }
+
             return {service, originCountryCode, destinationCountryCode};
         }).then(async function (response) {
-            const res = await http.get(dhlUrl, {
-                params: {
-                    'trackingNumber': trackingId,
-                    'service': response.service,
-                    'originCountryCode': response.originCountryCode,
-                    'requesterCountryCode': response.destinationCountryCode
-                },
-                headers: {
-                    'DHL-API-Key': dhlKey
-                }
-            }) 
+            if(response.service != false){
+                const res = await http.get(dhlUrl, {
+                    params: {
+                        'trackingNumber': trackingId,
+                        'service': response.service,
+                        'originCountryCode': response.originCountryCode,
+                        'requesterCountryCode': response.destinationCountryCode
+                    },
+                    headers: {
+                        'DHL-API-Key': dhlKey
+                    }
+                })
             return res;
+            } else {
+                return false;
+            }
         }).then(async function (res) {
             if(res.data.shipments[0].status){
                 status = res.data.shipments[0].status.statusCode;
@@ -138,7 +147,7 @@ async function track(num) {
                 if(nextSteps){
                     status +="\nNext Steps: " + nextSteps;
                 }
-                if(status === 'The shipment has been successfully delivered'){
+                if(status === 'delivered\nDescription: The shipment has been successfully delivered'){
                     // Delete from db
                     await deleteOne(trackingId);
                 } else {
@@ -214,7 +223,6 @@ function getAll(){
 }
 
 cron.schedule("*/30 * * * *", function() {
-    console.log("30 minute less lifetime");
     var numbers = db.get("numbers");
     if(numbers != undefined){
         numbers.value().forEach(number => {
