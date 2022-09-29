@@ -40,7 +40,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 // Endpoints
 app.post('/', (req, res) => {
     //console.log(req.body);
-    if (req.body.message) {
+    if (req.body.message && req.body.message.text) {
         const chatId = req.body.message.chat.id;
         const sentMessage = req.body.message.text;     // Regex for hello
         if (sentMessage.match(/\/track/gi)) {
